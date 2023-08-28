@@ -132,3 +132,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # 미디어 파일 설정
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# 로그인 후 연결할 url
+LOGIN_REDIRECT_URL = '/'
