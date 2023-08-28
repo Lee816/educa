@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 
+from .fields import OrderField
+
 # Create your models here.
 
 class Subject(models.Model):
@@ -40,9 +42,17 @@ class Module(models.Model):
     course = models.ForeignKey(Course, related_name='modules',on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    
+    # course를 사용해 코스에 따른 정렬을 계산한다고 명시
+    # 이렇게 하면 새 모듈의 정렬은 동일한 코스 객체의 마지막 모듈에 1을 더하여 할당
+    order = OrderField(blank=True,for_fields=['course'])
 
     def __str__(self) -> str:
-        return self.title
+        return f'{self.order}. {self.title}'
+    
+    # 기본 정렬 추가
+    class Meta :
+        ordering = ['order']
     
 class Content(models.Model):
     module = models.ForeignKey(Module, related_name='contents',on_delete=models.CASCADE)
@@ -54,6 +64,11 @@ class Content(models.Model):
     object_id = models.PositiveIntegerField()
     # 두개의 필드를 결합하여 개체를 직접 검색하거나 설정할 수 있는 필드
     item = GenericForeignKey('content_type','object_id')
+    
+    order = OrderField(blank=True, for_fields=['module'])
+    
+    class Meta:
+        ordering = ['order']
     
 class ItemBase(models.Model):
     # 콘텐츠를 생성한 사용자
