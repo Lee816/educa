@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 # Create your models here.
 
@@ -41,3 +43,44 @@ class Module(models.Model):
 
     def __str__(self) -> str:
         return self.title
+    
+class Content(models.Model):
+    module = models.ForeignKey(Module, related_name='contents',on_delete=models.CASCADE)
+    # ContentType 모델을 가리키는 필드
+    # limit_choices_to 를 이용해 content_type 개체를 제한
+    # model__in 필드 조회를 사용하여 다음 네가지 속성을 가진 ContentType 개체의 쿼리를 필터링
+    content_type = models.ForeignKey(ContentType,on_delete=models.CASCADE,limit_choices_to={'model__in':('text','video','image','file')})
+    # 관련 개체의 기본 키를 저장하는 필드
+    object_id = models.PositiveIntegerField()
+    # 두개의 필드를 결합하여 개체를 직접 검색하거나 설정할 수 있는 필드
+    item = GenericForeignKey('content_type','object_id')
+    
+class ItemBase(models.Model):
+    # 콘텐츠를 생성한 사용자
+    owner = models.ForeignKey(User,related_name='%(class)s_related',on_delete=models.CASCADE)
+    title = models.CharField(max_length=250)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        # 추상모델로 정의
+        abstract = True
+
+    def __str__(self) -> str:
+        return self.title
+
+# 텍스트 콘텐츠를 저장하기 위한 모델
+class Text(ItemBase):
+    content = models.TextField()
+
+# PDF와 같은 파일을 저장하기 위한 모델
+class File(ItemBase):
+    file = models.FileField(upload_to='files')
+
+# 이미지 파일을 저장하기 위한 모델
+class Image(ItemBase):
+    file = models.FileField(upload_to='images')
+
+# 비디오를 저장하기 위해 URLField 필드를 사용하여 비디오 URL을 임베드하기 위한 모델
+class Video(ItemBase):
+    url = models.URLField()
