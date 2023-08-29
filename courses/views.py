@@ -1,8 +1,10 @@
 from django.views import generic
 from django.urls import reverse_lazy
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 from .models import Course
+from .forms import ModuleFormSet
 
 # Create your views here.
 
@@ -51,3 +53,32 @@ class CourseUpdateView(OwnerCourseEditMixin, generic.UpdateView):
 class CourseDeleteView(OwnerCourseMixin, generic.DeleteView):
     template_name = 'courses/manage/course/delete.html'
     permission_required = 'courses.delete_course'
+
+# 특정 코스에 대한 모듈 추가, 업데이트, 삭제하기 위해 폼셋을 처리
+# TemplateResponseMixin - 템플릿을 렌더링하고 HTTP 응답을 반환 render_to_response()메서드를 제공하고 이 메서드를 사용하여 컨텍스트를 전달하고 템플릿을 렌더링
+# View - 기본 클래스 기반 뷰
+class CourseModuleUpdateView(generic.base.TemplateResponseMixin, generic.base.View):
+    template_name = 'courses/manage/module/formset.html'
+    course = None
+
+    # 폼셋을 구축하는 코드를 중복하지 않기 위한 메서드 주어진 코스 객체에 대한 ModuleFormSet객체를 생성하고 선택적으로 데이터를 전달
+    def get_formset(self, data=None):
+        return ModuleFormSet(instance=self.course, data=data)
+
+    # View클래스에서 제공되는 메서드
+    # HTTP 요청과 매개변수를 가져와서 사용된 HTTP 메서드와 일치하는 소문자 메서드에 위임 ex) GET -> get(), POST -> post()
+    def dispatch(self, request, pk):
+        # get 및 post 요청 모두에서 코스를 검색
+        self.course = get_object_or_404(Course, id=pk, owner=request.user)
+        return super().dispatch(request, pk)
+
+    def get(self, request, *args, **kwargs):
+        formset = self.get_formset()
+        return self.render_to_response({'course':self.course, 'formset':formset})
+    
+    def post(self, request, *args, **kwargs):
+        formset = self.get_formset(data=request.POST)
+        if formset.is_valid():
+            formset.save()
+            return redirect('manage_course_list')
+        return self.render_to_response({'course':self.course, 'formset':formset})
