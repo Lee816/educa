@@ -40,14 +40,14 @@ class OwnerCourseEditMixin(OwnerCourseMixin,OwnerEditMixin):
 
 class ManageCourseListView(OwnerCourseMixin, generic.ListView):
     template_name = 'courses/manage/course/list.html'
-    permission_required = 'courses/view_course'
+    permission_required = 'courses.view_course'
 
 class CourseCreateView(OwnerCourseEditMixin, generic.CreateView):
-    permission_required = 'courses/add_course'
+    permission_required = 'courses.add_course'
 
 class CourseUpdateView(OwnerCourseEditMixin, generic.UpdateView):
-    permission_required = 'courses/change_course'
+    permission_required = 'courses.change_course'
 
 class CourseDeleteView(OwnerCourseMixin, generic.DeleteView):
     template_name = 'courses/manage/course/delete.html'
-    permission_required = 'courses/delete_course'
+    permission_required = 'courses.delete_course'
