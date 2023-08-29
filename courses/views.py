@@ -103,8 +103,8 @@ class ContentCreateUpdateView(generic.base.TemplateResponseMixin, generic.base.V
     def get_form(self, model, *args, **kwargs):
         # modelform_factory() 함수를 사용하여 동적으로 폼을 생성 
         # exclude 매개변수를 사용하여 폼에서 제외할 공통 필드를 지정
-        Form = modelform_factory(model, exclude=['owner','order','created','updated'])
-        return Form(*args, **kwargs)
+        form_class = modelform_factory(model, exclude=['owner','order','created','updated'])
+        return form_class(*args, **kwargs)
     
     # URL 매개변수를 받아 해당 모듈,모델 및 콘텐츠 객체를 클래스 속성으로 저장
     # module_id - 콘텐츠가 될 모듈의 ID
