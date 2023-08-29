@@ -134,4 +134,4 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # 로그인 후 연결할 url
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'manage_course_list'
