@@ -128,10 +128,10 @@ class ContentCreateUpdateView(generic.base.TemplateResponseMixin, generic.base.V
     # post 요청이 수신되었들때 실행
     def post(self, request, module_id, model_name, id=None):
         # Text,Video, Image, File 모델에 대한 모델폼을 생성하고, 제출된 데이터와 파일을 폼에 전달하여 폼을검증
-        form = self.get_form(self.model, isinstance=self.obj, data=request.POST, files=request.FILES)
+        form = self.get_form(self.model, instance=self.obj, data=request.POST, files=request.FILES)
 
         if form.is_valid():
-            obj = form.save(commite=False)
+            obj = form.save(commit=False)
             obj.owner = request.user
             obj.save()
 
@@ -139,7 +139,7 @@ class ContentCreateUpdateView(generic.base.TemplateResponseMixin, generic.base.V
             # 주어진 모듈에 대해 Content 객체를 생성하고 새 콘텐츠를 연결
             if not id:
                 # new content
-                Content.objects.create(module=self.module, itema=obj)
+                Content.objects.create(module=self.module, item=obj)
                 
             return redirect('module_content_list', self.module.id)
             
