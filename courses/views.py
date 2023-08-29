@@ -2,8 +2,10 @@ from django.views import generic
 from django.urls import reverse_lazy
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.forms.models import modelform_factory
+from django.apps import apps
 
-from .models import Course
+from .models import Course, Module, Content
 from .forms import ModuleFormSet
 
 # Create your views here.
@@ -65,6 +67,7 @@ class CourseModuleUpdateView(generic.base.TemplateResponseMixin, generic.base.Vi
     def get_formset(self, data=None):
         return ModuleFormSet(instance=self.course, data=data)
 
+    # dispatch 메서드는 url에서 클래스 기반 뷰를 호출할때 실행된다
     # View클래스에서 제공되는 메서드
     # HTTP 요청과 매개변수를 가져와서 사용된 HTTP 메서드와 일치하는 소문자 메서드에 위임 ex) GET -> get(), POST -> post()
     def dispatch(self, request, pk):
@@ -82,3 +85,62 @@ class CourseModuleUpdateView(generic.base.TemplateResponseMixin, generic.base.Vi
             formset.save()
             return redirect('manage_course_list')
         return self.render_to_response({'course':self.course, 'formset':formset})
+    
+class ContentCreateUpdateView(generic.base.TemplateResponseMixin, generic.base.View):
+    module = None
+    model = None
+    obj = None
+    template_name = 'courses/manage/content/form.html'
+
+    def get_model(self,model_name):
+        # 주어진 모델 이름이 네가지 콘텐츠 모델 중 하나인지 확인
+        if model_name in ['text','video','image','file']:
+            # Django의 apps 모듈을 사용하여 주어진 모델 이름에 해당하는 실제 클래스를 가져옴
+            return apps.get_model(app_label='courses',model_name=model_name)
+        # 모델이름이 유효하지 않은 경우 None 을 반환
+        return None
+    
+    def get_form(self, model, *args, **kwargs):
+        # modelform_factory() 함수를 사용하여 동적으로 폼을 생성 
+        # exclude 매개변수를 사용하여 폼에서 제외할 공통 필드를 지정
+        Form = modelform_factory(model, exclude=['owner','order','created','updated'])
+        return Form(*args, **kwargs)
+    
+    # URL 매개변수를 받아 해당 모듈,모델 및 콘텐츠 객체를 클래스 속성으로 저장
+    # module_id - 콘텐츠가 될 모듈의 ID
+    # model_name - 생성, 업데이트할 콘텐츠의 모델 이름
+    # id - 업데이트 중인 객체의 ID
+    def dispatch(self, request, module_id, model_name, id=None):
+        self.module = get_object_or_404(Module, id=module_id, course__owner=request.user)
+        self.model = self.get_model(model_name)
+        
+        if id:
+            self.obj = get_object_or_404(self.model, id=id, owner = request.user)
+        return super().dispatch(request, module_id, model_name, id)
+    
+    # get 요청이 수신되었을 때 실행
+    # 업데이트되는 인스턴스의 모델폼을 생성
+    # 그렇지 않으면 새로운 객체를 생성하기 때문에 인스턴스를 지정하지 않고 빈폼을 생성(self.obj 가 None이기 때문)
+    def get(self, request, module_id, model_name, id=None):
+        form = self.get_form(self.model, instance=self.obj)
+        return self.render_to_response({'form':form, 'object': self.obj})
+    
+    # post 요청이 수신되었들때 실행
+    def post(self, request, module_id, model_name, id=None):
+        # Text,Video, Image, File 모델에 대한 모델폼을 생성하고, 제출된 데이터와 파일을 폼에 전달하여 폼을검증
+        form = self.get_form(self.model, isinstance=self.obj, data=request.POST, files=request.FILES)
+
+        if form.is_valid():
+            obj = form.save(commite=False)
+            obj.owner = request.user
+            obj.save()
+
+            # id 매개변수를 확인하여 id가 제공되지 않은 경우 사용자가 기존 객체를 업데이트하는 대신 새로운 객체를 생성
+            # 주어진 모듈에 대해 Content 객체를 생성하고 새 콘텐츠를 연결
+            if not id:
+                # new content
+                Content.objects.create(module=self.module, itema=obj)
+                
+            return redirect('module_content_list', self.module.id)
+            
+        return self.render_to_response({'form':form, 'object': self.obj})
