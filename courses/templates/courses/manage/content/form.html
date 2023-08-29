@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}
+        Edit content "{{ object.title }}"
+    {% else %}
+        Add new content.
+    {% endif %}
+{% endblock title %}
+
+{% block content %}
+    <h1>
+        {% if object %}
+            Edit content "{{ object.title }}"
+        {% else %}
+            Add new content
+        {% endif %}
+    </h1>
+    <div class="module">
+        <h2>Course info</h2>
+        {% comment %} enctype='multipart/form-data'는 파일 업로드가 포함되어 있기 때문에 사용 {% endcomment %}
+        <form enctype='multipart/form-data' method="post">
+            {{ form.as_p }}
+            {% csrf_token %}
+            <p><input type="submit" value="Save content"></p>
+        </form>
+    </div>
+{% endblock content %}
