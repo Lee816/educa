@@ -9,4 +9,6 @@ urlpatterns = [
     path('<int:pk>/edit/', views.CourseUpdateView.as_view(), name='course_edit'),
     path('<int:pk>/delete/', views.CourseDeleteView.as_view(), name='course_delete'),
     path('<int:pk>/module/',views.CourseModuleUpdateView.as_view(), name='course_module_update'),
+    path('module/<int:module_id>/content/<str:model_name>/create/', views.ContentCreateUpdateView.as_view(), name='module_content_create'),
+    path('module/<int:module_id>/content/<str:model_name>/<int:id>/',views.ContentCreateUpdateView.as_view(), name='module_content_update'),
 ]
