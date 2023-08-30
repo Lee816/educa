@@ -4,6 +4,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.forms.models import modelform_factory
 from django.apps import apps
+from braces.views import CsrfExemptMixin, JsonRequestResponseMixin
 
 from .models import Course, Module, Content
 from .forms import ModuleFormSet
@@ -160,3 +161,17 @@ class ModuleContentListView(generic.base.TemplateResponseMixin, generic.base.Vie
         module = get_object_or_404(Module, id=module_id, course__owner = request.user)
 
         return self.render_to_response({'module':module})
+    
+# 모듈의 순서를 업데이트하는 클래스뷰
+class ModuleOrderView(CsrfExemptMixin,JsonRequestResponseMixin):
+    def post(self,request):
+        for id, order in self.request_json.items():
+            Module.objects.filter(id=id, course__owner=request.user).update(order=order)
+        return self.render_json_response({'saved':'OK'})
+    
+# 모듈의 콘텐츠의 순서를 업데이트하는 클래스 뷰
+class ContentOrderView(CsrfExemptMixin,JsonRequestResponseMixin,generic.base.View):
+    def post(self,request):
+        for id, order in self.request_json.items():
+            Content.objects.filter(id=id, module__course__owner=request.user).update(order=order)
+        return self.render_json_response({'saved':'OK'})
