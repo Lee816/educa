@@ -163,7 +163,7 @@ class ModuleContentListView(generic.base.TemplateResponseMixin, generic.base.Vie
         return self.render_to_response({'module':module})
     
 # 모듈의 순서를 업데이트하는 클래스뷰
-class ModuleOrderView(CsrfExemptMixin,JsonRequestResponseMixin):
+class ModuleOrderView(CsrfExemptMixin,JsonRequestResponseMixin, generic.base.View):
     def post(self,request):
         for id, order in self.request_json.items():
             Module.objects.filter(id=id, course__owner=request.user).update(order=order)
