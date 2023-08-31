@@ -138,3 +138,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # 학생이 로그인 후 연결할 url
 LOGIN_REDIRECT_URL = reverse_lazy('student_course_list')
+
+# pymemcache 설정
+CACHED = {
+    'default' : {
+        'BACKEND' : 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'LOCATION' : '127.0.0.1:11211'
+    }
+}
