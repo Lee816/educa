@@ -30,6 +30,8 @@ class Course(models.Model):
     overview = models.TextField()
     # 강좌가 생성된 날짜와 시간
     created = models.DateTimeField(auto_now_add=True)
+    
+    students = models.ManyToManyField(User, related_name='courses_joined', blank=True)
 
     class Meta:
         ordering = ['-created']
