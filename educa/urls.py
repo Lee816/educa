@@ -29,7 +29,7 @@ urlpatterns = [
     path('', CourseListView.as_view(), name='course_list'),
     path('course/', include('courses.urls')),
     path('students/',include('students.urls')),
-    path('__debug__', include('debug_toolbar.urls')),
+    path('__debug__/', include('debug_toolbar.urls')),
     
 ]
 
