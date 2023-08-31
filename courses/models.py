@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.template.loader import render_to_string
 
 from .fields import OrderField
 
@@ -85,6 +86,11 @@ class ItemBase(models.Model):
 
     def __str__(self) -> str:
         return self.title
+    
+    def render(self):
+        # render_to_string 함수는 템플릿을 렌더링하고 렌더링된 내용을 문자열로 반환
+        # self._mata.model_name을 사용하여 동적으로 각 콘텐츠 모델에 대한 템플릿 이름을 생성
+        return render_to_string(f'courses/content/{self._meta._model_name}.html',{'item':self})
 
 # 텍스트 콘텐츠를 저장하기 위한 모델
 class Text(ItemBase):
