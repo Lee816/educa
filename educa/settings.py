@@ -152,3 +152,7 @@ CACHED = {
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+if DEBUG:
+    import mimetypes
+    mimetypes.add_type('application/javascript','.js',True)
+    mimetypes.add_type('text/css','.css',True)
