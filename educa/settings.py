@@ -145,12 +145,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_REDIRECT_URL = reverse_lazy('student_course_list')
 
 # pymemcache 설정
-# CACHED = {
-#     'default' : {
-#         'BACKEND' : 'django.core.cache.backends.memcached.PyMemcacheCache',
-#         'LOCATION' : '127.0.0.1:11211'
-#     }
-# }
+CACHED = {
+    'default' : {
+        'BACKEND' : 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'LOCATION' : '127.0.0.1:11211'
+    }
+}
 
 INTERNAL_IPS = [
     '127.0.0.1',
@@ -166,9 +166,9 @@ CACHE_MIDDLEWARE_SECONDS = 60 * 15 # 15분
 CACHE_MIDDLEWARE_KEY_PREFIX = 'educa'
 
 # redis 캐시 설정
-CACHED = {
-    'default' : {
-        'BACKEND' : 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION' : 'redis://127.0.0.1:6379'
-    }
-}
+# CACHED = {
+#     'default' : {
+#         'BACKEND' : 'django.core.cache.backends.redis.RedisCache',
+#         'LOCATION' : 'redis://127.0.0.1:6379'
+#     }
+# }
