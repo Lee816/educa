@@ -52,7 +52,9 @@ MIDDLEWARE = [
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',
     'django.middleware.common.CommonMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -156,3 +158,8 @@ if DEBUG:
     import mimetypes
     mimetypes.add_type('application/javascript','.js',True)
     mimetypes.add_type('text/css','.css',True)
+    
+# 사이트 전체 캐시 사용 설정
+CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_SECONDS = 60 * 15 # 15분
+CACHE_MIDDLEWARE_KEY_PREFIX = 'educa'
