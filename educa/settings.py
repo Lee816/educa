@@ -173,3 +173,11 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'educa'
 #         'LOCATION' : 'redis://127.0.0.1:6379'
 #     }
 # }
+
+# rest_framework 설정
+# DEFAULT_PERMISSION_CLASSES 설정은 객체를 읽기,생성,업데이트, 삭제 하기 위한 기본 권한을 지정
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES' : [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
