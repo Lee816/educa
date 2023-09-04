@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -6,7 +6,7 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from ..models import Subject, Course
-from .serializers import SubjectSerializer
+from .serializers import SubjectSerializer, CourseSerializer
 
 class SubjectListView(generics.ListAPIView):
     # 객체를 검색하기 위해 사용할 기본 QuerySet
@@ -30,3 +30,8 @@ class CourseEnrollView(APIView):
         # Course 객체의 학생 등록
         course.students.add(request.user)
         return Response({'enrolled':True})
+    
+# ReadOnlyModelViewSet 는 list() 와 retrieve()를 통해 객체 목록을 가져오거나 단일 객체를 검색하는 읽기 전용 동작
+class CourseViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
