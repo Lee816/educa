@@ -36,6 +36,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
     'courses.apps.CoursesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,7 +51,6 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'redisboard',
     'rest_framework',
-    'channels',
 ]
 
 MIDDLEWARE = [
@@ -83,6 +84,8 @@ TEMPLATES = [
     },
 ]
 
+# channels ASGI 설정
+ASGI_APPLICATION = 'educa.asgi.application'
 WSGI_APPLICATION = 'educa.wsgi.application'
 
 
