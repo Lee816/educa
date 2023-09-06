@@ -3,5 +3,5 @@ from django.urls import re_path
 from . import consumer
 
 websocket_urlpatterns = [
-    re_path(r'ws/chat/room/(?P<course_>\d+)/$', consumer.ChatConsumer.as_asgi()),
+    re_path(r'ws/chat/room/(?P<course_id>\d+)/$', consumer.ChatConsumer.as_asgi()),
 ]
