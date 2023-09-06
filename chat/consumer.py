@@ -6,7 +6,7 @@ from django.utils import timezone
 
 class ChatConsumer(WebsocketConsumer):
     # 새 연결이 수신되었을때 호출
-    def connect(self):
+    async def connect(self):
         # self.scope['user']를 사용하여 현재 사용자를 가져오고 새로운 user 속성으로 저장 메시지를 보낸 사용자를 식별하기 위해 사용
         self.user = self.scope['user']
         # scope에서 course_id 매개변수를 검색하여 채팅방이 연결된 강의를 알아낸다.
@@ -14,25 +14,25 @@ class ChatConsumer(WebsocketConsumer):
         # 각 강의 채팅방에 대해 채널 그룹을 생성
         self.room_group_name = f'chat_{self.id}'
         # 현재 채널에 그룹을 추가하고 그룹에 참여
-        async_to_sync(self.channel_layer.group_add)(self.room_group_name,self.channel_name)
+        await self.channel_layer.group_add(self.room_group_name,self.channel_name)
         # 모든 연결 수락
-        self.accept()
+        await self.accept()
     
     # 소켓이 닫힐 때 호출
-    def disconnect(self, close_code):
+    async def disconnect(self, close_code):
         # 그룹에서 나가기
-        async_to_sync(self.channel_layer.group_discard)(self.room_group_name, self.channel_name)
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     # receive()는 데이터를 수신할 때마다 호출
     # WebSocket에서 메시지 수신
-    def receive(self, text_data):
+    async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         now = timezone.now()
         # 메시지를 WebSocket으로 전송
         #self.send(text_data=json.dumps({'message':message}))
         # 그룹에 메시지 보내기
-        async_to_sync(self.channel_layer.group_send)(self.room_group_name,{
+        await self.channel_layer.group_send(self.room_group_name,{
             'type' : 'chat_message', # type : 이벤트 타입, 특별한 키로 해당하는 이벤트를 받는 컨슈머에서 실행되어야 할 메서드의 이름과 일치해야한다.
             'message' : message,
             'user' : self.user.username, # 현재 사용자
@@ -40,6 +40,6 @@ class ChatConsumer(WebsocketConsumer):
         })
         
     # 그룹에서 메시지 받기
-    def chat_message(self, event):
+    async def chat_message(self, event):
         # WebSocket으로 메시지 보내기
-        self.send(text_data=json.dumps(event))
+        await self.send(text_data=json.dumps(event))
