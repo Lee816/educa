@@ -1,10 +1,10 @@
 import json
 
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import async_to_sync
 from django.utils import timezone
 
-class ChatConsumer(WebsocketConsumer):
+class ChatConsumer(AsyncWebsocketConsumer):
     # 새 연결이 수신되었을때 호출
     async def connect(self):
         # self.scope['user']를 사용하여 현재 사용자를 가져오고 새로운 user 속성으로 저장 메시지를 보낸 사용자를 식별하기 위해 사용
@@ -15,7 +15,7 @@ class ChatConsumer(WebsocketConsumer):
         self.room_group_name = f'chat_{self.id}'
         # 현재 채널에 그룹을 추가하고 그룹에 참여
         await self.channel_layer.group_add(self.room_group_name,self.channel_name)
-        # 모든 연결 수락
+        # 연결 수락
         await self.accept()
     
     # 소켓이 닫힐 때 호출
