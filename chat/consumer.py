@@ -2,10 +2,13 @@ import json
 
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
+from django.utils import timezone
 
 class ChatConsumer(WebsocketConsumer):
     # 새 연결이 수신되었을때 호출
     def connect(self):
+        # self.scope['user']를 사용하여 현재 사용자를 가져오고 새로운 user 속성으로 저장 메시지를 보낸 사용자를 식별하기 위해 사용
+        self.user = self.scope['user']
         # scope에서 course_id 매개변수를 검색하여 채팅방이 연결된 강의를 알아낸다.
         self.id = self.scope['url_route']['kwargs']['course_id']
         # 각 강의 채팅방에 대해 채널 그룹을 생성
@@ -25,12 +28,15 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        now = timezone.now()
         # 메시지를 WebSocket으로 전송
         #self.send(text_data=json.dumps({'message':message}))
         # 그룹에 메시지 보내기
         async_to_sync(self.channel_layer.group_send)(self.room_group_name,{
             'type' : 'chat_message', # type : 이벤트 타입, 특별한 키로 해당하는 이벤트를 받는 컨슈머에서 실행되어야 할 메서드의 이름과 일치해야한다.
             'message' : message,
+            'user' : self.user.username, # 현재 사용자
+            'datetime' : now.isoformat(), # ISO 8601 형식으로 채널그룹에 보낼때 사용
         })
         
     # 그룹에서 메시지 받기
