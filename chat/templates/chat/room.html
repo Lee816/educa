@@ -11,9 +11,50 @@
 {% endblock content %}
 
 {% block include_js %}
-
+    {{ course.id|json_script:"course-id" }}
 {% endblock include_js %}
 
 {% block domready %}
+    const courseId = JSON.parse(
+        document.getElementById('course-id').textContent
+    );
+    const url = 'ws://' + window.location.host + '/ws/chat/room/' + courseId + '/';
+    const chatSocket = new WebSocket(url);
 
+    // onmessage - 웹소켓을 통해 데이터가 수신될때 발생
+    chatSocket.onmessage = function(event) {
+        const data = JSON.parse(event.data)
+        const chat = document.getElementById('chat')
+        
+        chat.innerHTML += '<div class="message">' + data.message + '</div>';
+        chat.scrollTop = chat.scrollHeight;
+    };
+    // onclose - 웹소켓과의 연결이 닫힐때 발생
+    chatSocket.onclose = function(event) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    // 메시지 소켓에 보내기
+    const input = document.getElementById('chat-message-input');
+    const submitButton = document.getElementById('chat-message-submit');
+    submitButton.addEventListener("click", function(event) {
+        const message = input.value;
+        if(message) {
+            // send message in JSON format
+            chatSocket.send(JSON.stringify({'message':message}));
+            // clear input
+            input.value = '';
+            input.focus();
+        }
+    });
+    input.addEventListener('keypress', function(event){
+        if (event.key === 'Enter') {
+            // cancel the default action, if needed
+            event.preventDefault();
+            // trigger click event on button
+            submitButton.click();
+        }
+    });
+
+    input.focus();
 {% endblock domready %}
