@@ -9,13 +9,14 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
+# 공통 설정이 포함된 기본 설정 파일 (기존 settings.py)
 
 from pathlib import Path
 import os, json
 from django.urls import reverse_lazy
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 with open(os.path.join(BASE_DIR, "secret.json")) as f:
     secret = json.loads(f.read())
