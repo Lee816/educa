@@ -28,9 +28,6 @@ with open(os.path.join(BASE_DIR, "secret.json")) as f:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = secret['SECRET_KEY']
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -88,20 +85,6 @@ TEMPLATES = [
 # channels ASGI 설정
 ASGI_APPLICATION = 'educa.asgi.application'
 WSGI_APPLICATION = 'educa.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": secret['DB_NAME'],
-        "USER": secret['DB_USER'],
-        "PASSWORD": secret['DB_PASSWORD'],
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -162,10 +145,6 @@ CACHED = {
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
-if DEBUG:
-    import mimetypes
-    mimetypes.add_type('application/javascript','.js',True)
-    mimetypes.add_type('text/css','.css',True)
     
 # 사이트 전체 캐시 사용 설정
 CACHE_MIDDLEWARE_ALIAS = 'default'
