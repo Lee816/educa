@@ -22,3 +22,7 @@ DATABASES = {
         'PORT' : 5432,
     }
 }
+
+REDIS_URL = 'redis://cache:6379'
+CACHED['default']['LOCATION'] = REDIS_URL
+CHANNEL_LAYERS['default']['CONFIG']['hosts'] = [REDIS_URL]
