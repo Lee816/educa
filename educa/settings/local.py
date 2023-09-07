@@ -1,4 +1,10 @@
 # 로컬 환경에 대한 사용자 지정 설정
+# 로컬 환경 서버 실행 환경변수 설정
+# linux, macOS - export DJANGO_SETTINGS_MODULE = educa.settings.local
+# window - set DJANGO_SETTINGS_MODULE = educa.settings.local
+
+# 환경 변수 설정 전 실행 방법 - python manage.py runserver --settings=educa.settings.local
+# 환경 변수 설정 후 실행 방법 - python manage.py runserver
 
 import os, json
 
