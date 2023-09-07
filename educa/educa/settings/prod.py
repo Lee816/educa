@@ -1,5 +1,6 @@
 # 프로덕션 환경을 위한 사용자 지정 설정
 
+import os
 from .base import *
 
 DEBUG = False
@@ -13,6 +14,11 @@ ALLOWED_HOSTS = ['*']
 
 DATABASES = {
     'default' : {
-        
+        'ENGINE' : 'django.db.backends.postgresql',
+        'NAME' : os.environ.get('POSTGRES_DB'),
+        'USER' : os.environ.get('POSTGRES_USER'),
+        'PASSWORD' : os.environ.get('POSTGRES_PASSWORD'),
+        'HOST' : 'db',
+        'PORT' : 5432,
     }
 }
